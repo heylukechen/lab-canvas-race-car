@@ -14,8 +14,20 @@ const myGameArea = {
     this.context = this.canvas.getContext("2d");
     this.interval = setInterval(updateGameArea, 10);
   },
+
   clear: function () {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  },
+
+  stop: function () {
+    clearInterval(this.interval);
+  },
+  points: 0,
+  score: function () {
+    this.points = Math.floor(this.frames / 5);
+    this.context.font = "18px serif";
+    this.context.fillStyle = "white";
+    this.context.fillText(`Score: ${this.points}`, 40, 20);
   },
 };
 
@@ -34,6 +46,28 @@ let myCar = {
     if (tempX >= 26 && tempX <= 226) {
       this.x = tempX;
     }
+  },
+
+  left: function () {
+    return this.x;
+  },
+  right: function () {
+    return this.x + this.width;
+  },
+  top: function () {
+    return this.y;
+  },
+  bottom: function () {
+    return this.y + this.height;
+  },
+
+  crashWith: function (obstacle) {
+    return !(
+      this.bottom() < obstacle.top() ||
+      this.top() > obstacle.bottom() ||
+      this.right() < obstacle.left() ||
+      this.left() > obstacle.right()
+    );
   },
 };
 
@@ -56,6 +90,28 @@ class Obstacle {
     let ctx = myGameArea.context;
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+
+  left() {
+    return this.x;
+  }
+  right() {
+    return this.x + this.width;
+  }
+  top() {
+    return this.y;
+  }
+  bottom() {
+    return this.y + this.height;
+  }
+
+  crashWith(obstacle) {
+    return !(
+      this.bottom() < obstacle.top() ||
+      this.top() > obstacle.bottom() ||
+      this.right() < obstacle.left() ||
+      this.left() > obstacle.right()
+    );
   }
 }
 
@@ -82,6 +138,24 @@ function updateObstacle() {
     obstacles.push(new Obstacle(width, 10, "red", x, y));
   }
 }
+function checkGameOver() {
+  const crashed = obstacles.some(function (obstacle) {
+    return myCar.crashWith(obstacle);
+  });
+
+  if (crashed) {
+    myGameArea.stop();
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 380, 282, 61);
+    ctx.font = "18px serif";
+    ctx.fillStyle = "red";
+    ctx.fillText(`Game Over`, 20, 400);
+    ctx.font = "18px serif";
+    ctx.fillStyle = "white";
+    ctx.fillText(`Your final score ${myGameArea.points}`, 20, 420);
+  }
+}
 
 function updateGameArea() {
   myGameArea.clear();
@@ -89,6 +163,8 @@ function updateGameArea() {
   myCar.newPos();
   myCar.update();
   updateObstacle();
+  checkGameOver();
+  myGameArea.score();
 }
 
 myGameArea.start();
