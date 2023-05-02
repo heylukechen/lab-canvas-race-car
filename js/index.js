@@ -138,6 +138,7 @@ function updateObstacle() {
     obstacles.push(new Obstacle(width, 10, "red", x, y));
   }
 }
+
 function checkGameOver() {
   const crashed = obstacles.some(function (obstacle) {
     return myCar.crashWith(obstacle);
@@ -167,7 +168,7 @@ function updateGameArea() {
   myGameArea.score();
 }
 
-myGameArea.start();
+
 
 window.onload = () => {
   gameScreen.style.display = "none";
@@ -179,6 +180,7 @@ window.onload = () => {
 function startGame() {
   startingScreen.style.display = "none";
   gameScreen.style.display = "block";
+  myGameArea.start();
 }
 
 ///Event listener to update the position of the car
